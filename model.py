@@ -1,5 +1,5 @@
 '''
-so... we read a map file 26 for 26 size with next file structure
+so... we read a map file 24 for 24 size with next file structure
 space for free, black space
 33 _ascii code "!" for first image block
 ! - for first 5x5 image block 0, 0, 73, 80
@@ -15,12 +15,28 @@ import numpy as np
 from os import path, getcwd
 
 
+class Player:
+
+    def __init__(self, top, left, direction):
+        '''
+        top, left - top, left border of the player _rect
+        direction - direction in which the gun turned
+        speed - constant speed of player moving
+        stage - which tank type is our player visually
+        '''
+        self.top = top
+        self.left = left
+        self.direction = direction
+        self.speed = 0
+        self.stage = 0
+
+
 class Field:
 
     def __init__(self, map_name):
         '''
         map_name - is path to map_file ready to use in open function.
-        we have 26 x 26 battle landscape
+        we have 24 x 24 battle landscape
         '''
         self.borders = 2
         self.size = 24 + self.borders

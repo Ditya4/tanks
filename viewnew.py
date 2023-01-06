@@ -2,6 +2,25 @@ import pygame
 from os import path
 
 
+class Player(pygame.sprite.Sprite):
+
+    def __init__(self, canvas, rect_size):
+        super().__init__()
+        self.canvas = canvas
+        self.rect_size = rect_size
+        self.image = pygame.Surface([self.rect_size, self.rect_size])
+        self.image.fill("red")
+        self.rect = self.image.get_rect()
+        self.player_group = pygame.sprite.Group()
+        self.player_group.add(self)
+
+    def update(self):
+        x, y = pygame.mouse.get_pos()
+        self.rect.y = y
+        self.rect.x = x
+        self.player_group.draw(self.canvas)
+
+
 class Texture(pygame.sprite.Sprite):
     '''
     height and width are standard texture size
@@ -62,7 +81,9 @@ class Battlefield:
         return texture
 
     def fill_texture_dict(self):
-        texture_data_list = [["brick", "!", 0, 550], ]
+        texture_data_list = [["brick", "!", 0, 550],
+                             ["grass", ",", 58, 585],
+                             ["water_1", "+", 58, 550], ]
 
         for texture_data in texture_data_list:
             self.texture_dict[texture_data[1]] = (texture_data[2],
@@ -84,7 +105,6 @@ class Battlefield:
                             self.texture_image)
                         self.texture_group.add(texture)
         self.texture_group.draw(self.canvas)
-        pass
 
 
 class Window:
@@ -107,11 +127,14 @@ class Window:
                                        self.height,
                                        self.canvas,
                                        self.model_field)
+        self.player = Player(self.canvas, 25)
+
 
     def update(self):
         self.canvas.fill((0, 5, 150))
         self.statistic.update()
         self.battlefield.update()
+        self.player.update()
         pygame.display.update()
 
 
