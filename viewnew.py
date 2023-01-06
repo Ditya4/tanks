@@ -6,8 +6,8 @@ class Texture(pygame.sprite.Sprite):
     '''
     height and width are standard texture size
     '''
-    height = 52
-    width = 57
+    height = 28
+    width = 35
 
     def __init__(self, y, x, texture_top_left, texture):
         '''
@@ -62,13 +62,14 @@ class Battlefield:
         return texture
 
     def fill_texture_dict(self):
-        texture_data_list = [["brick", "!", 0, 895], ]
+        texture_data_list = [["brick", "!", 0, 550], ]
 
         for texture_data in texture_data_list:
             self.texture_dict[texture_data[1]] = (texture_data[2],
                                                   texture_data[3])
 
     def update(self):
+        self.texture_group.empty()
         for y in range(1, self.model_field.size):
             for x in range(1, self.model_field.size):
                 if self.model_field.landscape[y][x] != 32:  # not space symbol
@@ -90,13 +91,13 @@ class Window:
 
     def __init__(self, width, height, model_field):
         '''
-        700x700 battle_field
-        100x700 statistic
+        800x750 battle_field
+        100x750 statistic
         '''
         self.width = width
         self.height = height
         self.model_field = model_field
-        self.statistic_width = self.width - 700
+        self.statistic_width = self.width - 800
         self.canvas = pygame.display.set_mode((self.width, self.height))
         self.statistic = Statistic(self.statistic_width,
                                    self.height,

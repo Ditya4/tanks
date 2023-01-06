@@ -22,15 +22,16 @@ class Field:
         map_name - is path to map_file ready to use in open function.
         we have 26 x 26 battle landscape
         '''
-        borders = 2
-        self.size = 26 + borders
+        self.borders = 2
+        self.size = 24 + self.borders
         self.map_name = map_name
         self.landscape = np.zeros((self.size, self.size), np.int32).reshape(
                               self.size, self.size)
+        ascii_for_border = 125
         for i in range(self.size):
             self.landscape[0][i] = self.landscape[i][0] = (
                 self.landscape[i][self.size - 1]) = (
-                    self.landscape[self.size - 1][i]) = 125
+                    self.landscape[self.size - 1][i]) = ascii_for_border
         self.read_map()
 
     def read_map(self):
@@ -42,8 +43,8 @@ class Field:
         for i in range(len(map_lines)):
             map_lines[i] = map_lines[i].rstrip("\n")
         print(map_lines)
-        for y in range(0, self.size - 2):
-            for x in range(0, self.size - 2):
+        for y in range(0, self.size - self.borders):
+            for x in range(0, self.size - self.borders):
                 print(map_lines[y][x], end="")
                 self.landscape[y + 1][x + 1] = ord(map_lines[y][x])
             print()
