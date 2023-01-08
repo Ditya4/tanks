@@ -38,8 +38,11 @@ class Player:
         self.vertical_speed = 0
 
     def change_speed(self, horizontal, vertical):
-        self.horizontal_speed = horizontal
-        self.vertical_speed = vertical
+        if horizontal and vertical:
+            print("pressed bouth buttons")
+            input()
+        self.horizontal_speed += horizontal
+        self.vertical_speed += vertical
         old_left = self.left
         self.left += self.horizontal_speed
         print("move horizontal with speed", self.horizontal_speed)
