@@ -4,27 +4,54 @@ from os import path
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, model_player, canvas, rect_size):
-        super().__init__()
+    def __init__(self, model_player, window):
         '''
+        For start we'll take any texture tank picture but later it's going to
+        change, during moving and player direction.
+        '''
+        player_texture_left = 0
+        player_texture_top = 0
+        super().__init__()
+        self.player_group = pygame.sprite.Group()
+
         self.model_player = model_player
-        self.canvas = canvas
-        self.rect_size = rect_size
-        self.image = pygame.Surface([self.rect_size, self.rect_size])
+        self.window = window
+        self.canvas = self.window.canvas
+        self.width = self.window.texture_width
+        self.height = self.window.texture_height
+        self.image = pygame.Surface([self.width, self.height])
+
+
+        
+        player_texture = Texture(
+            self.model_player.top, self.model_player.left,
+            (player_texture_top, player_texture_left),
+            self.window.texture_image, self.window)
+        self.player_group.add(player_texture)
+        self.rect = self.image.get_rect()
+        self.player_group.draw(self.canvas)
+        
+        
+        
+        '''
         self.image.fill("red")
         self.rect = self.image.get_rect()
         self.player_group = pygame.sprite.Group()
         self.player_group.add(self)
         '''
+        
 
     def update(self):
         pass
-        '''
+        
         x, y = pygame.mouse.get_pos()
-        self.rect.y = y
-        self.rect.x = x
+        self.model_player.top = y
+        self.model_player.left = x
+        self.rect.top = y
+        self.rect.left = x
+        
         self.player_group.draw(self.canvas)
-        '''
+        
 
 
 class Texture(pygame.sprite.Sprite):
@@ -46,8 +73,8 @@ class Texture(pygame.sprite.Sprite):
                                           self.window.texture_height))
         self.image.set_colorkey("black")
         self.rect = self.image.get_rect()
-        self.rect.top = y * self.window.texture_height
-        self.rect.left = x * self.window.texture_width
+        self.rect.top = y
+        self.rect.left = x
 
 
 class Statistic:
@@ -73,16 +100,19 @@ class Battlefield:
         self.texture_dict = {}
         self.fill_texture_dict()
         self.texture_group = pygame.sprite.Group()
-        self.texture_image = self.get_texture_image()
+        self.texture_image = window.texture_image
         self.update()
 
     def get_texture_image(self):
+        '''
         sprites_folder = "sprites"
         sprites_file_name = "battle city sprites upsized.png"
         sprites_full_name = (path.join(sprites_folder,
                                        sprites_file_name))
         texture = pygame.image.load(sprites_full_name).convert()
         return texture
+        '''
+        pass
 
     def fill_texture_dict(self):
         texture_data_list = [["brick", "!", 0, 550],
@@ -103,7 +133,8 @@ class Battlefield:
                         print(y, x, self.model_field.landscape[y][x])
 
                         texture = Texture(
-                            y - 1, x - 1,
+                            (y - 1) * self.window.texture_height,
+                            (x - 1) * self.window.texture_width,
                             self.texture_dict[chr(
                                 self.model_field.landscape[y][x])],
                             self.texture_image, self.window)
@@ -131,6 +162,7 @@ class Window:
         self.model_player = model_player
         self.statistic_width = self.width - 800
         self.canvas = pygame.display.set_mode((self.width, self.height))
+        self.texture_image = self.get_texture_image()
         self.statistic = Statistic(self.statistic_width,
                                    self.height,
                                    self.width - self.statistic_width,
@@ -139,8 +171,15 @@ class Window:
                                        self.height,
                                        self,
                                        self.model_field)
-        self.player = Player(self.model_player, self.canvas, self.battlefield)
+        self.player = Player(self.model_player, self)
 
+    def get_texture_image(self):
+        sprites_folder = "sprites"
+        sprites_file_name = "battle city sprites upsized.png"
+        sprites_full_name = (path.join(sprites_folder,
+                                       sprites_file_name))
+        texture = pygame.image.load(sprites_full_name).convert()
+        return texture
 
     def update(self):
         self.canvas.fill((0, 5, 150))
@@ -148,6 +187,8 @@ class Window:
         self.battlefield.update()
         self.player.update()
         pygame.display.update()
+
+    
 
 
 
