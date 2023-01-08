@@ -30,7 +30,7 @@ if __name__ == "__main__":
     player_start_left = 300
     player_start_top = 600
     player_direction = "up"
-    fps = 1
+    fps = 25
     field = model.Field(map_full_name)
     player = model.Player(player_start_top, player_start_left,
                           player_direction)

@@ -9,48 +9,56 @@ class Player(pygame.sprite.Sprite):
         For start we'll take any texture tank picture but later it's going to
         change, during moving and player direction.
         '''
-        player_texture_left = 0
-        player_texture_top = 0
+        self.player_texture_left = 0
+        self.player_texture_top = 0
+
         super().__init__()
-        self.player_group = pygame.sprite.Group()
 
         self.model_player = model_player
         self.window = window
         self.canvas = self.window.canvas
         self.width = self.window.texture_width
         self.height = self.window.texture_height
-        self.image = pygame.Surface([self.width, self.height])
+
+        self.player_group = pygame.sprite.Group()
+        self.update()
+
+        '''
+        self.texture_group = pygame.sprite.Group()
+        self.texture_image = window.texture_image
+        self.update()
+        '''
 
 
-        
-        player_texture = Texture(
-            self.model_player.top, self.model_player.left,
-            (player_texture_top, player_texture_left),
-            self.window.texture_image, self.window)
-        self.player_group.add(player_texture)
-        self.rect = self.image.get_rect()
-        self.player_group.draw(self.canvas)
-        
-        
-        
         '''
         self.image.fill("red")
         self.rect = self.image.get_rect()
         self.player_group = pygame.sprite.Group()
         self.player_group.add(self)
         '''
-        
 
     def update(self):
-        pass
-        
+        self.player_group = pygame.sprite.Group()
+        self.image = pygame.Surface([self.width, self.height])
+
+
+
+        self.player_texture = Texture(
+            self.model_player.top, self.model_player.left,
+            (self.player_texture_top, self.player_texture_left),
+            self.window.texture_image, self.window)
+        self.player_group.add(self.player_texture)
+        self.rect = self.image.get_rect()
         x, y = pygame.mouse.get_pos()
         self.model_player.top = y
         self.model_player.left = x
         self.rect.top = y
         self.rect.left = x
-        
         self.player_group.draw(self.canvas)
+        
+        
+        
+        # self.player_group.draw(self.canvas)
         
 
 
@@ -66,7 +74,7 @@ class Texture(pygame.sprite.Sprite):
         super().__init__()
         self.window = window
         self.image = pygame.Surface([self.window.texture_width,
-                                     self.window.texture_height]).convert()
+                                     self.window.texture_height])#  .convert()
         self.image.blit(texture, (0, 0), (texture_top_left[1],
                                           texture_top_left[0],
                                           self.window.texture_width,
@@ -182,7 +190,7 @@ class Window:
         return texture
 
     def update(self):
-        self.canvas.fill((0, 5, 150))
+        self.canvas.fill((0, 0, 0))
         self.statistic.update()
         self.battlefield.update()
         self.player.update()
