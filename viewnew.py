@@ -4,8 +4,10 @@ from os import path
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, canvas, rect_size):
+    def __init__(self, model_player, canvas, rect_size):
         super().__init__()
+        '''
+        self.model_player = model_player
         self.canvas = canvas
         self.rect_size = rect_size
         self.image = pygame.Surface([self.rect_size, self.rect_size])
@@ -13,22 +15,21 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.player_group = pygame.sprite.Group()
         self.player_group.add(self)
+        '''
 
     def update(self):
+        pass
+        '''
         x, y = pygame.mouse.get_pos()
         self.rect.y = y
         self.rect.x = x
         self.player_group.draw(self.canvas)
+        '''
 
 
 class Texture(pygame.sprite.Sprite):
-    '''
-    height and width are standard texture size
-    '''
-    height = 28
-    width = 35
 
-    def __init__(self, y, x, texture_top_left, texture):
+    def __init__(self, y, x, texture_top_left, texture, window):
         '''
         y, x where we need to draw a texture
         texture_top_left - (top, left) where we need to take texture from
@@ -36,15 +37,17 @@ class Texture(pygame.sprite.Sprite):
 
         '''
         super().__init__()
-        self.image = pygame.Surface([self.width, self.height]).convert()
+        self.window = window
+        self.image = pygame.Surface([self.window.texture_width,
+                                     self.window.texture_height]).convert()
         self.image.blit(texture, (0, 0), (texture_top_left[1],
                                           texture_top_left[0],
-                                          self.width,
-                                          self.height))
+                                          self.window.texture_width,
+                                          self.window.texture_height))
         self.image.set_colorkey("black")
         self.rect = self.image.get_rect()
-        self.rect.top = y * self.height
-        self.rect.left = x * self.width
+        self.rect.top = y * self.window.texture_height
+        self.rect.left = x * self.window.texture_width
 
 
 class Statistic:
@@ -61,10 +64,11 @@ class Statistic:
 
 class Battlefield:
 
-    def __init__(self, width, height, canvas, model_field):
+    def __init__(self, width, height, window, model_field):
         self.width = width
         self.height = height
-        self.canvas = canvas
+        self.window = window
+        self.canvas = window.canvas
         self.model_field = model_field
         self.texture_dict = {}
         self.fill_texture_dict()
@@ -102,21 +106,29 @@ class Battlefield:
                             y - 1, x - 1,
                             self.texture_dict[chr(
                                 self.model_field.landscape[y][x])],
-                            self.texture_image)
+                            self.texture_image, self.window)
                         self.texture_group.add(texture)
         self.texture_group.draw(self.canvas)
 
 
 class Window:
 
-    def __init__(self, width, height, model_field):
+    def __init__(self, width, height,
+                 texture_width, texture_height,
+                 model_field, model_player):
+
         '''
+        height and width are standard texture size
+
         800x750 battle_field
         100x750 statistic
         '''
         self.width = width
         self.height = height
+        self.texture_width = texture_width
+        self.texture_height = texture_height
         self.model_field = model_field
+        self.model_player = model_player
         self.statistic_width = self.width - 800
         self.canvas = pygame.display.set_mode((self.width, self.height))
         self.statistic = Statistic(self.statistic_width,
@@ -125,9 +137,9 @@ class Window:
                                    self.canvas)
         self.battlefield = Battlefield(self.width - self.statistic_width,
                                        self.height,
-                                       self.canvas,
+                                       self,
                                        self.model_field)
-        self.player = Player(self.canvas, 25)
+        self.player = Player(self.model_player, self.canvas, self.battlefield)
 
 
     def update(self):
