@@ -23,12 +23,36 @@ class Player:
         direction - direction in which the gun turned
         speed - constant speed of player moving
         stage - which tank type is our player visually
+        tank_model - simple = 0, a bit better = 1, double bullet = 2,
+        concrete smasher = 3
+        ? cause we only move in direction, in which our payer turned, probably
+        speed should be changed here, not in control.
         '''
         self.top = top
         self.left = left
         self.direction = direction
+        self.tank_model = 0
         self.speed = 0
         self.stage = 0
+        self.horizontal_speed = 0
+        self.vertical_speed = 0
+
+    def change_speed(self, horizontal, vertical):
+        self.horizontal_speed = horizontal
+        self.vertical_speed = vertical
+        old_left = self.left
+        self.left += self.horizontal_speed
+        print("move horizontal with speed", self.horizontal_speed)
+        if 1 != 1:
+        # if pygame.sprite.spritecollideany(self, walls) is not None:
+            self.left = old_left
+
+        old_top = self.top
+        self.top += self.vertical_speed
+        if 1 != 1:
+        # if pygame.sprite.spritecollideany(self, walls) is not None:
+            self.top = old_top
+        print("move vertical with speed", self.vertical_speed)
 
 
 class Field:
@@ -58,12 +82,12 @@ class Field:
         map_lines = map_file.readlines()
         for i in range(len(map_lines)):
             map_lines[i] = map_lines[i].rstrip("\n")
-        print(map_lines)
+        # print(map_lines)
         for y in range(0, self.size - self.borders):
             for x in range(0, self.size - self.borders):
-                print(map_lines[y][x], end="")
+                # print(map_lines[y][x], end="")
                 self.landscape[y + 1][x + 1] = ord(map_lines[y][x])
-            print()
+            # print()
 
 
 if __name__ == "__main__":
@@ -72,7 +96,7 @@ if __name__ == "__main__":
     map_full_name = (path.join(map_folder, map_file_name))
 
     field = Field(map_full_name)
-    print(field.landscape)
+    # print(field.landscape)
 
 
 

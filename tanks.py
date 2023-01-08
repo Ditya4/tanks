@@ -30,7 +30,7 @@ if __name__ == "__main__":
     player_start_left = 300
     player_start_top = 600
     player_direction = "up"
-    fps = 25
+    fps = 3
     field = model.Field(map_full_name)
     player = model.Player(player_start_top, player_start_left,
                           player_direction)
@@ -41,14 +41,18 @@ if __name__ == "__main__":
     manage = control.CheckEvents()
     clock = pygame.time.Clock()
 
-    print(field.landscape)
+    # print(field.landscape)
     window.update()
     done = False
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
-            manage.check_events(event, player, field)
+            
+            # keys = pygame.key.get_pressed()
+            # manage.check_events(keys, event, player, field)
+        keys = pygame.key.get_pressed()
+        manage.check_events(keys, event, player, field)
         window.update()
         clock.tick(fps)
 

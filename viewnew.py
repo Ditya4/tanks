@@ -29,7 +29,6 @@ class Player(pygame.sprite.Sprite):
         self.update()
         '''
 
-
         '''
         self.image.fill("red")
         self.rect = self.image.get_rect()
@@ -41,25 +40,20 @@ class Player(pygame.sprite.Sprite):
         self.player_group = pygame.sprite.Group()
         self.image = pygame.Surface([self.width, self.height])
 
-
-
         self.player_texture = Texture(
             self.model_player.top, self.model_player.left,
             (self.player_texture_top, self.player_texture_left),
             self.window.texture_image, self.window)
         self.player_group.add(self.player_texture)
         self.rect = self.image.get_rect()
-        x, y = pygame.mouse.get_pos()
-        self.model_player.top = y
-        self.model_player.left = x
-        self.rect.top = y
-        self.rect.left = x
+        # x, y = pygame.mouse.get_pos()
+        # self.model_player.top = y
+        # self.model_player.left = x
+        self.rect.top = self.model_player.top
+        self.rect.left = self.model_player.left
         self.player_group.draw(self.canvas)
-        
-        
-        
+
         # self.player_group.draw(self.canvas)
-        
 
 
 class Texture(pygame.sprite.Sprite):
@@ -138,7 +132,7 @@ class Battlefield:
                 if self.model_field.landscape[y][x] != 32:  # not space symbol
                     if chr(self.model_field.landscape[y][x]) in (
                             self.texture_dict):
-                        print(y, x, self.model_field.landscape[y][x])
+                        # print(y, x, self.model_field.landscape[y][x])
 
                         texture = Texture(
                             (y - 1) * self.window.texture_height,
