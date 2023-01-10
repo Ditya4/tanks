@@ -4,9 +4,10 @@ from time import time
 
 class CheckEvents:
 
-    def __init__(self):
+    def __init__(self, window):
         self.player = None
         self.field = None
+        self.window = window
 
     def check_events(self, event, player, field, keys):
         '''
@@ -117,7 +118,7 @@ class CheckEvents:
 
         if self.keys[pygame.K_LEFT]:
             if not left_button_pressed:
-                if self.can_move():
+                if self.can_move_horizontal():
                     self.move()
                 left_button_pressed = 1
                 left_button_pressed_time_start = time()
@@ -125,13 +126,13 @@ class CheckEvents:
                 left_button_pressed_time = (
                     time() - left_button_pressed_time_start)
                 if left_button_pressed_time > button_press_delta:
-                    if self.can_move():
+                    if self.can_move_horizontal():
                         self.move()
                     left_button_pressed_time_start = time()
 
         elif keys[pygame.K_RIGHT]:
             if not right_button_pressed:
-                if self.can_move():
+                if self.can_move_horizontal():
                     self.move()
                 right_button_pressed = 1
                 right_button_pressed_time_start = time()
@@ -139,13 +140,13 @@ class CheckEvents:
                 right_button_pressed_time = (
                     time() - right_button_pressed_time_start)
                 if right_button_pressed_time > button_press_delta:
-                    if self.can_move():
+                    if self.can_move_horizontal():
                         self.move()
                     right_button_pressed_time_start = time()
 
         elif keys[pygame.K_UP]:
             if not up_button_pressed:
-                if self.can_move():
+                if self.can_move_vertical():
                     self.move()
                 up_button_pressed = 1
                 up_button_pressed_time_start = time()
@@ -153,13 +154,13 @@ class CheckEvents:
                 up_button_pressed_time = (
                     time() - up_button_pressed_time_start)
                 if up_button_pressed_time > button_press_delta:
-                    if self.can_move():
+                    if self.can_move_vertical():
                         self.move()
                     up_button_pressed_time_start = time()
 
         elif keys[pygame.K_DOWN]:
             if not down_button_pressed:
-                if self.can_move():
+                if self.can_move_vertical():
                     self.move()
                 down_button_pressed = 1
                 down_button_pressed_time_start = time()
@@ -167,10 +168,29 @@ class CheckEvents:
                 down_button_pressed_time = (
                     time() - down_button_pressed_time_start)
                 if down_button_pressed_time > button_press_delta * 3:
-                    if self.can_move():
+                    if self.can_move_vertical():
                         self.move()
                     down_button_pressed_time_start = time()
 
+    def can_move_horizontal(self):
+        if self.window.battlefield.can_move_horizontal(self.player):
+            return True
+        else:
+            return False
+
+    def can_move_vertical(self):
+        if self.window.battlefield.can_move_vertical(self.player):
+            return True
+        else:
+            return False
+
+    '''
+    def can_move_right(self):
+        if self.window.battlefield.can_move_right(self.player):
+            return True
+        else:
+            return False
+    '''
     def can_move(self):
         return True
 

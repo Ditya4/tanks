@@ -115,6 +115,9 @@ class Statistic:
 class Battlefield:
 
     def __init__(self, width, height, window, model_field):
+        '''
+        not_passable_texture_group(brick, concrete, borders)
+        '''
         self.width = width
         self.height = height
         self.window = window
@@ -122,16 +125,19 @@ class Battlefield:
         self.model_field = model_field
         self.texture_dict = {}
         self.fill_texture_dict()
-        
-        self.texture_group = pygame.sprite.Group()  # erase
-        
+
+        # self.texture_group = pygame.sprite.Group()  # erase
+
         self.texture_group_under_player = pygame.sprite.Group()
         self.texture_group_over_player = pygame.sprite.Group()
-        
+
+        self.borders_texture_group = pygame.sprite.Group()
+        self.not_passable_texture_group = pygame.sprite.Group()
+
         self.texture_image = window.texture_image
         self.update()
 
-    def get_texture_image(self):
+    # def get_texture_image(self):
         '''
         sprites_folder = "sprites"
         sprites_file_name = "battle city sprites upsized.png"
@@ -140,7 +146,7 @@ class Battlefield:
         texture = pygame.image.load(sprites_full_name).convert()
         return texture
         '''
-        pass
+        # pass
 
     def fill_texture_dict(self):
         '''
@@ -153,9 +159,9 @@ class Battlefield:
         6. does this texture should be drawn under tank(ice, water) or
            over tank(trees)(True - under/False - over)
         '''
-        texture_data_list = [["brick", "!", 0, 550, True, True],
-                             ["grass", ",", 58, 585, False, False],
-                             ["water_1", "+", 58, 550, False, True], ]
+        texture_data_list = [["brick", "!", 0, 550, False, True],
+                             ["grass", ",", 58, 585, True, False],
+                             ["water_1", "+", 58, 550, True, True], ]
 
         for texture_data in texture_data_list:
             self.texture_dict[texture_data[1]] = (texture_data[2],
@@ -164,10 +170,11 @@ class Battlefield:
                                                   texture_data[5], )
 
     def update(self):
+        self.not_passable_texture_group.empty()
         self.texture_group_under_player.empty()
         self.texture_group_over_player.empty()
 
-        self.texture_group.empty()  # erase
+        # self.texture_group.empty()  # erase
         for y in range(1, self.model_field.size):
             for x in range(1, self.model_field.size):
                 if self.model_field.landscape[y][x] != 32:  # not space symbol
@@ -187,8 +194,13 @@ class Battlefield:
                             self.texture_group_under_player.add(texture)
                         else:
                             self.texture_group_over_player.add(texture)
-                        
-                        self.texture_group.add(texture)  # erase
+
+                        if not self.texture_dict[chr(
+                                    self.model_field.landscape[y][x])][2]:
+                            self.not_passable_texture_group.add(texture)
+
+
+                        # self.texture_group.add(texture)  # erase
         # self.texture_group.draw(self.canvas)  # erase
 
     def draw_under(self):
@@ -197,6 +209,29 @@ class Battlefield:
     def draw_over(self):
         self.texture_group_over_player.draw(self.canvas)
 
+    def can_move_horizontal(self, model_player):
+        player = self.window.player
+        old_left = player.rect.left
+        player.rect.left += model_player.horizontal_speed
+        if pygame.sprite.spritecollideany(
+                player, self.not_passable_texture_group) is not None:
+            player.rect.left = old_left
+            return False
+        return True
+        # print("move horizontal with speed", self.horizontal_speed)
+        #  if pygame.sprite.spritecollideany(self, walls) is not None:
+        # if 1 != 1:
+        #     self.left = old_left
+
+    def can_move_vertical(self, model_player):
+        player = self.window.player
+        old_top = player.rect.top
+        player.rect.top += model_player.vertical_speed
+        if pygame.sprite.spritecollideany(
+                player, self.not_passable_texture_group) is not None:
+            player.rect.top = old_top
+            return False
+        return True
 
 
 class Window:

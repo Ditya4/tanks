@@ -25,7 +25,8 @@ if __name__ == "__main__":
                             texture_width, texture_height,
                             field, player)
 
-    manage = control.CheckEvents()
+    manage = control.CheckEvents(window)
+
     clock = pygame.time.Clock()
 
     window.update()
