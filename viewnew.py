@@ -122,7 +122,12 @@ class Battlefield:
         self.model_field = model_field
         self.texture_dict = {}
         self.fill_texture_dict()
-        self.texture_group = pygame.sprite.Group()
+        
+        self.texture_group = pygame.sprite.Group()  # erase
+        
+        self.texture_group_under_player = pygame.sprite.Group()
+        self.texture_group_over_player = pygame.sprite.Group()
+        
         self.texture_image = window.texture_image
         self.update()
 
@@ -138,16 +143,31 @@ class Battlefield:
         pass
 
     def fill_texture_dict(self):
-        texture_data_list = [["brick", "!", 0, 550],
-                             ["grass", ",", 58, 585],
-                             ["water_1", "+", 58, 550], ]
+        '''
+        data format:
+        1. just some name
+        2. _ascii symbol in file
+        3. top border of texture
+        4. left border of texture
+        5. could player move over this texture(True/False)
+        6. does this texture should be drawn under tank(ice, water) or
+           over tank(trees)(True - under/False - over)
+        '''
+        texture_data_list = [["brick", "!", 0, 550, True, True],
+                             ["grass", ",", 58, 585, False, False],
+                             ["water_1", "+", 58, 550, False, True], ]
 
         for texture_data in texture_data_list:
             self.texture_dict[texture_data[1]] = (texture_data[2],
-                                                  texture_data[3])
+                                                  texture_data[3],
+                                                  texture_data[4],
+                                                  texture_data[5], )
 
     def update(self):
-        self.texture_group.empty()
+        self.texture_group_under_player.empty()
+        self.texture_group_over_player.empty()
+
+        self.texture_group.empty()  # erase
         for y in range(1, self.model_field.size):
             for x in range(1, self.model_field.size):
                 if self.model_field.landscape[y][x] != 32:  # not space symbol
@@ -159,10 +179,24 @@ class Battlefield:
                             (y - 1) * self.window.texture_height,
                             (x - 1) * self.window.texture_width,
                             self.texture_dict[chr(
-                                self.model_field.landscape[y][x])],
+                                self.model_field.landscape[y][x])][:2],
                             self.texture_image, self.window)
-                        self.texture_group.add(texture)
-        self.texture_group.draw(self.canvas)
+
+                        if self.texture_dict[chr(
+                                self.model_field.landscape[y][x])][3]:
+                            self.texture_group_under_player.add(texture)
+                        else:
+                            self.texture_group_over_player.add(texture)
+                        
+                        self.texture_group.add(texture)  # erase
+        # self.texture_group.draw(self.canvas)  # erase
+
+    def draw_under(self):
+        self.texture_group_under_player.draw(self.canvas)
+
+    def draw_over(self):
+        self.texture_group_over_player.draw(self.canvas)
+
 
 
 class Window:
@@ -208,7 +242,9 @@ class Window:
         self.canvas.fill((0, 0, 0))
         self.statistic.update()
         self.battlefield.update()
+        self.battlefield.draw_under()
         self.player.update()
+        self.battlefield.draw_over()
         pygame.display.update()
 
 
