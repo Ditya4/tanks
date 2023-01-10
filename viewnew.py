@@ -68,7 +68,7 @@ class Texture(pygame.sprite.Sprite):
         super().__init__()
         self.window = window
         self.image = pygame.Surface([self.window.texture_width,
-                                     self.window.texture_height])#  .convert()
+                                     self.window.texture_height])  # .convert()
         self.image.blit(texture, (0, 0), (texture_top_left[1],
                                           texture_top_left[0],
                                           self.window.texture_width,
@@ -190,7 +190,7 @@ class Window:
         self.player.update()
         pygame.display.update()
 
-    
+
 
 
 

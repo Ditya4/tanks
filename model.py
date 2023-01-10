@@ -10,9 +10,8 @@ unbreakable and unmovable objects(borders of map) zero and self.size + 1
 indexes
 
 '''
-import pygame
 import numpy as np
-from os import path, getcwd
+from os import path
 
 
 class Player:
@@ -38,24 +37,27 @@ class Player:
         self.vertical_speed = 0
 
     def change_speed(self, horizontal, vertical):
-        if horizontal and vertical:
+        # if horizontal and vertical:
+        if self.horizontal_speed and vertical:
+
             print("pressed bouth buttons")
-            input()
+            return
+            # input()
         self.horizontal_speed += horizontal
         self.vertical_speed += vertical
         old_left = self.left
         self.left += self.horizontal_speed
-        print("move horizontal with speed", self.horizontal_speed)
+        # print("move horizontal with speed", self.horizontal_speed)
+        #  if pygame.sprite.spritecollideany(self, walls) is not None:
         if 1 != 1:
-        # if pygame.sprite.spritecollideany(self, walls) is not None:
             self.left = old_left
 
         old_top = self.top
         self.top += self.vertical_speed
-        if 1 != 1:
         # if pygame.sprite.spritecollideany(self, walls) is not None:
+        if 1 != 1:
             self.top = old_top
-        print("move vertical with speed", self.vertical_speed)
+        # print("move vertical with speed", self.vertical_speed)
 
 
 class Field:

@@ -5,19 +5,6 @@ import viewnew
 import control
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
     pygame.init()
     map_folder = "maps"
@@ -46,15 +33,16 @@ if __name__ == "__main__":
     done = False
     while not done:
         # keys = pygame.key.get_pressed()
+        keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
 
-            manage.check_events(event, player, field)
+            manage.check_events(event, player, field, keys)
             # keys = pygame.key.get_pressed()
             # manage.check_events(keys, event, player, field)
         # print(player.vertical_speed, player.horizontal_speed)
-        keys = pygame.key.get_pressed()
+        
         # print(keys)
         if any(keys):
             manage.check_pressed_keys(keys, player, field)
@@ -64,5 +52,3 @@ if __name__ == "__main__":
         # manage.check_events(keys, event, player, field)
         window.update()
         clock.tick(fps)
-
-
