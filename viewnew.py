@@ -1,5 +1,6 @@
 import pygame
 from os import path
+from random import choice
 
 
 class Player(pygame.sprite.Sprite):
@@ -37,6 +38,26 @@ class Player(pygame.sprite.Sprite):
         '''
 
     def update(self):
+        '''
+        first if-else make a change image of player in dependence of
+        player direction and moving visualization
+        '''
+        # print(self.model_player.tank_model(self.model_player.direction))
+        if (self.model_player.vertical_speed or
+                self.model_player.horizontal_speed):
+            random_image = choice([0, 1])
+            self.player_texture_left = self.model_player.tank_model(
+                self.model_player.direction)[random_image][1]
+            self.player_texture_top = self.model_player.tank_model(
+                self.model_player.direction)[random_image][0]
+        else:
+            self.player_texture_left = (
+                self.model_player.tank_model(
+                    self.model_player.direction)[0][1])
+            self.player_texture_top = (
+                self.model_player.tank_model(
+                    self.model_player.direction)[0][0])
+
         self.player_group = pygame.sprite.Group()
         self.image = pygame.Surface([self.width, self.height])
 

@@ -28,27 +28,18 @@ if __name__ == "__main__":
     manage = control.CheckEvents()
     clock = pygame.time.Clock()
 
-    # print(field.landscape)
     window.update()
     done = False
     while not done:
-        # keys = pygame.key.get_pressed()
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
 
             manage.check_events(event, player, field, keys)
-            # keys = pygame.key.get_pressed()
-            # manage.check_events(keys, event, player, field)
-        # print(player.vertical_speed, player.horizontal_speed)
-        
-        # print(keys)
+
         if any(keys):
             manage.check_pressed_keys(keys, player, field)
 
-        # manage.check_events(keys, event, player, field)
-        # keys = pygame.key.get_pressed()
-        # manage.check_events(keys, event, player, field)
         window.update()
         clock.tick(fps)

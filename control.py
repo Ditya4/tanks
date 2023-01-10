@@ -17,6 +17,7 @@ class CheckEvents:
         self.field = field
         self.event = event
         self.keys = keys
+        self.old_direction = player.direction
         if event.type == pygame.KEYDOWN:
             # if (self.player.vertical_speed != 0 and
             #         self.player.horizontal_speed != 0):
@@ -43,9 +44,9 @@ class CheckEvents:
             if event.key == pygame.K_LEFT:
                 if self.player.horizontal_speed == -5:
                     self.player.change_speed(5, 0)
-                    print("keys[pygame.K_LEFT] is", keys[pygame.K_LEFT],
-                          "len(keys) =",
-                          len(list(filter(lambda x: x is True, keys))))
+                    # print("keys[pygame.K_LEFT] is", keys[pygame.K_LEFT],
+                    #       "len(keys) =",
+                    #       len(list(filter(lambda x: x is True, keys))))
                     if (self.key_down(keys, "left") != (0, 0) and
                             len(list(filter(lambda x: x is True, keys))) == 2):
                         # print(self.key_down(keys))
@@ -54,7 +55,7 @@ class CheckEvents:
             if event.key == pygame.K_RIGHT:
                 if self.player.horizontal_speed == 5:
                     self.player.change_speed(-5, 0)
-                    print(self.key_down(keys, "right"))
+                    # print(self.key_down(keys, "right"))
                     if (self.key_down(keys, "right") != (0, 0) and
                             len(list(filter(lambda x: x is True, keys))) == 2):
                         self.player.change_speed(
@@ -63,7 +64,7 @@ class CheckEvents:
             if event.key == pygame.K_UP:
                 if self.player.vertical_speed == -5:
                     self.player.change_speed(0, 5)
-                    print(self.key_down(keys, "up"))
+                    # print(self.key_down(keys, "up"))
                     if (self.key_down(keys, "up") != (0, 0) and
                             len(list(filter(lambda x: x is True, keys))) == 2):
                         self.player.change_speed(*self.key_down(keys, "up"))
@@ -74,11 +75,15 @@ class CheckEvents:
             if event.key == pygame.K_DOWN:
                 if self.player.vertical_speed == 5:
                     self.player.change_speed(0, -5)
-                    print(self.key_down(keys, "down"))
+                    # print(self.key_down(keys, "down"))
                     if (self.key_down(keys, "down") != (0, 0) and
                             len(list(filter(lambda x: x is True, keys))) == 2):
                         # print(self.key_down(keys))
                         self.player.change_speed(*self.key_down(keys, "down"))
+        '''
+        if self.old_direction != self.player.direction:
+            change_direction_image
+        '''
 
     def key_down(self, keys, upped_key):
         '''

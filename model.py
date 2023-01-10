@@ -14,6 +14,38 @@ import numpy as np
 from os import path
 
 
+class TankModel:
+    '''
+    we create a _dict with next format
+    ["left"] = {(55, 70), (90,70)}
+    coordinates will be different for each model of tank
+    also need to make a call method with direction as argument to
+    return this _dict
+    '''
+
+    def __init__(self, model_index):
+        self.model_index = model_index
+        self.imges_dict = {}
+        self.fill_images_dict()
+
+    def fill_images_dict(self):
+
+        if self.model_index == 0:
+            self.images_dict = {"left": [[0, 68], [0, 102]],
+                                "right": [[0, 204], [0, 238]],
+                                "up": [[0, 0], [0, 34]],
+                                "down": [[0, 136], [0, 170]], }
+
+        elif self.model_index == 1:
+            self.images_dict = {"left": [[28, 68], [28, 102]],
+                                "right": [[28, 204], [28, 238]],
+                                "up": [[28, 0], [28, 34]],
+                                "down": [[28, 136], [28, 170]], }
+
+    def __call__(self, direction):
+        return self.images_dict[direction]
+
+
 class Player:
 
     def __init__(self, top, left, direction):
@@ -26,17 +58,29 @@ class Player:
         concrete smasher = 3
         ? cause we only move in direction, in which our payer turned, probably
         speed should be changed here, not in control.
+        TankModel will be _dict of lists of pairs top and left
+        for moving images
+
+        new one for every different tank_model_index.
+        !!!
+        i don't need direction, cause direction will be sended as
+        parameter to the _dict to get image
+        with keys of self.direction("left", "right") i
         '''
         self.top = top
         self.left = left
         self.direction = direction
-        self.tank_model = 0
+        self.tank_model_index = 1
+        self.tank_model = TankModel(self.tank_model_index)
         self.speed = 0
         self.stage = 0
         self.horizontal_speed = 0
         self.vertical_speed = 0
 
-    def change_speed(self, horizontal, vertical):
+    def change_speed(self, horizontal_speed, vertical_speed):
+        self.horizontal_speed += horizontal_speed
+        self.vertical_speed += vertical_speed
+        '''
         # if horizontal and vertical:
         if self.horizontal_speed and vertical:
 
@@ -58,6 +102,7 @@ class Player:
         if 1 != 1:
             self.top = old_top
         # print("move vertical with speed", self.vertical_speed)
+        '''
 
 
 class Field:
