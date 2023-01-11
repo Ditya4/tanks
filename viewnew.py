@@ -70,8 +70,10 @@ class Player(pygame.sprite.Sprite):
         # x, y = pygame.mouse.get_pos()
         # self.model_player.top = y
         # self.model_player.left = x
-        self.rect.top = self.model_player.top
-        self.rect.left = self.model_player.left
+        self.rect.top = self.model_player.top + 4
+        self.rect.left = self.model_player.left + 4
+        self.rect.height = self.window.texture_height - 4
+        self.rect.width = self.window.texture_width - 4
         self.player_group.draw(self.canvas)
 
         # self.player_group.draw(self.canvas)
@@ -125,6 +127,7 @@ class Battlefield:
         self.model_field = model_field
         self.texture_dict = {}
         self.fill_texture_dict()
+        self.first_call_for_read_borders = True
 
         # self.texture_group = pygame.sprite.Group()  # erase
 
@@ -175,9 +178,10 @@ class Battlefield:
         self.texture_group_over_player.empty()
 
         # self.texture_group.empty()  # erase
-        for y in range(1, self.model_field.size):
-            for x in range(1, self.model_field.size):
-                if self.model_field.landscape[y][x] != 32:  # not space symbol
+        for y in range(self.model_field.size):
+            for x in range(self.model_field.size):
+                # next condition not space symbol and border symbol
+                if self.model_field.landscape[y][x] not in (32, 125):
                     if chr(self.model_field.landscape[y][x]) in (
                             self.texture_dict):
                         # print(y, x, self.model_field.landscape[y][x])
@@ -198,7 +202,15 @@ class Battlefield:
                         if not self.texture_dict[chr(
                                     self.model_field.landscape[y][x])][2]:
                             self.not_passable_texture_group.add(texture)
-
+                if (self.first_call_for_read_borders and
+                        self.model_field.landscape[y][x] == 125):
+                    texture = Texture(
+                            (y - 1) * self.window.texture_height,
+                            (x - 1) * self.window.texture_width,
+                            [0, 0],
+                            self.texture_image, self.window)
+                    self.borders_texture_group.add(texture)
+        self.first_call_for_read_borders = False
 
                         # self.texture_group.add(texture)  # erase
         # self.texture_group.draw(self.canvas)  # erase
@@ -213,8 +225,10 @@ class Battlefield:
         player = self.window.player
         old_left = player.rect.left
         player.rect.left += model_player.horizontal_speed
-        if pygame.sprite.spritecollideany(
-                player, self.not_passable_texture_group) is not None:
+        if (pygame.sprite.spritecollideany(
+                player, self.not_passable_texture_group) is not None or
+                pygame.sprite.spritecollideany(
+                player, self.borders_texture_group) is not None):
             player.rect.left = old_left
             return False
         return True
@@ -227,8 +241,10 @@ class Battlefield:
         player = self.window.player
         old_top = player.rect.top
         player.rect.top += model_player.vertical_speed
-        if pygame.sprite.spritecollideany(
-                player, self.not_passable_texture_group) is not None:
+        if (pygame.sprite.spritecollideany(
+                player, self.not_passable_texture_group) is not None or
+                pygame.sprite.spritecollideany(
+                player, self.borders_texture_group) is not None):
             player.rect.top = old_top
             return False
         return True

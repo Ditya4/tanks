@@ -173,16 +173,10 @@ class CheckEvents:
                     down_button_pressed_time_start = time()
 
     def can_move_horizontal(self):
-        if self.window.battlefield.can_move_horizontal(self.player):
-            return True
-        else:
-            return False
+        return self.window.battlefield.can_move_horizontal(self.player)
 
     def can_move_vertical(self):
-        if self.window.battlefield.can_move_vertical(self.player):
-            return True
-        else:
-            return False
+        return self.window.battlefield.can_move_vertical(self.player)
 
     '''
     def can_move_right(self):
