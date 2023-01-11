@@ -1,5 +1,11 @@
 import pygame
 from time import time
+import model
+
+
+'''
+IDK how to create Bullet WO import model (((
+'''
 
 
 class CheckEvents:
@@ -38,6 +44,13 @@ class CheckEvents:
                 if event.key == pygame.K_DOWN:
                     self.player.direction = "down"
                     self.player.change_speed(0, 5)
+
+            if event.key == pygame.K_SPACE:
+                self.window.model_bullets.append(
+                    model.Bullet(
+                            self.player.direction,
+                            player.left + self.window.texture_width // 4 + 3,
+                            player.top + self.window.texture_height // 4 - 4))
 
         if event.type == pygame.KEYUP:
             # self.player.change_speed(0, 0)

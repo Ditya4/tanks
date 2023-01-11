@@ -14,13 +14,44 @@ import numpy as np
 from os import path
 
 
+class Bullet:
+
+    def __init__(self, direction, left, top):
+        self.direction = direction
+        self.left = left
+        self.top = top
+        self.speed = self.calculate_speed()
+        self.textures = self.textures_coords()
+        # first calling update method for move top_left to the direction,
+        # where the end of barrel is.
+        self.update()
+
+    def calculate_speed(self):
+        speeds = {"left": (-7, 0),
+                  "right": (7, 0),
+                  "up": (0, -7),
+                  "down": (0, 7), }
+        return speeds[self.direction]
+
+    def textures_coords(self):
+        images_dict = {"left": [172, 705],
+                       "right": [172, 740],
+                       "up": [172, 678],
+                       "down": [172, 724], }
+        return images_dict
+
+    def update(self):
+        self.left += self.speed[0]
+        self.top += self.speed[1]
+
+
 class TankModel:
     '''
     we create a _dict with next format
     ["left"] = {(55, 70), (90,70)}
     coordinates will be different for each model of tank
     also need to make a call method with direction as argument to
-    return this _dict
+    return certain value of this _dict
     '''
 
     def __init__(self, model_index):

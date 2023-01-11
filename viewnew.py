@@ -81,21 +81,30 @@ class Player(pygame.sprite.Sprite):
 
 class Texture(pygame.sprite.Sprite):
 
-    def __init__(self, y, x, texture_top_left, texture, window):
+    def __init__(self, y, x, texture_top_left, texture,
+                 window, half_size=False):
         '''
         y, x where we need to draw a texture
         texture_top_left - (top, left) where we need to take texture from
         texture_image - image with all textures
+        half_size - is a flag to create a texture with size half of regular
 
         '''
         super().__init__()
         self.window = window
+        self.width = self.window.texture_width
+        self.height = self.window.texture_height
+
+        if half_size:
+            self.width //= 2
+            self.height //= 2
+
         self.image = pygame.Surface([self.window.texture_width,
                                      self.window.texture_height])  # .convert()
         self.image.blit(texture, (0, 0), (texture_top_left[1],
                                           texture_top_left[0],
-                                          self.window.texture_width,
-                                          self.window.texture_height))
+                                          self.width,
+                                          self.height))
         self.image.set_colorkey("black")
         self.rect = self.image.get_rect()
         self.rect.top = y
@@ -125,6 +134,7 @@ class Battlefield:
         self.window = window
         self.canvas = window.canvas
         self.model_field = model_field
+        self.model_bullets = self.window.model_bullets
         self.texture_dict = {}
         self.fill_texture_dict()
         self.first_call_for_read_borders = True
@@ -136,6 +146,8 @@ class Battlefield:
 
         self.borders_texture_group = pygame.sprite.Group()
         self.not_passable_texture_group = pygame.sprite.Group()
+
+        self.bullets_texture_group = pygame.sprite.Group()
 
         self.texture_image = window.texture_image
         self.update()
@@ -211,15 +223,35 @@ class Battlefield:
                             self.texture_image, self.window)
                     self.borders_texture_group.add(texture)
         self.first_call_for_read_borders = False
+        self.update_bullets()
 
-                        # self.texture_group.add(texture)  # erase
+        # self.texture_group.add(texture)  # erase
         # self.texture_group.draw(self.canvas)  # erase
+
+    def update_bullets(self):
+        '''
+        check all model_bullets and for each of them we create a
+        texture
+        '''
+        self.bullets_texture_group.empty()
+
+        for model_bullet in self.model_bullets:
+            model_bullet.update()
+            texture = Texture(
+                            model_bullet.top,
+                            model_bullet.left,
+                            model_bullet.textures[model_bullet.direction],
+                            self.texture_image, self.window, True)
+            self.bullets_texture_group.add(texture)
 
     def draw_under(self):
         self.texture_group_under_player.draw(self.canvas)
 
     def draw_over(self):
         self.texture_group_over_player.draw(self.canvas)
+
+    def draw_bullets(self):
+        self.bullets_texture_group.draw(self.canvas)
 
     def can_move_horizontal(self, model_player):
         player = self.window.player
@@ -268,6 +300,7 @@ class Window:
         self.texture_height = texture_height
         self.model_field = model_field
         self.model_player = model_player
+        self.model_bullets = []
         self.statistic_width = self.width - 800
         self.canvas = pygame.display.set_mode((self.width, self.height))
         self.texture_image = self.get_texture_image()
@@ -296,6 +329,9 @@ class Window:
         self.battlefield.draw_under()
         self.player.update()
         self.battlefield.draw_over()
+        self.battlefield.draw_bullets()
+
+        # self.battlefield.b
         pygame.display.update()
 
 
