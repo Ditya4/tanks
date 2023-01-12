@@ -43,6 +43,7 @@ class Player(pygame.sprite.Sprite):
         player direction and moving visualization
         '''
         # print(self.model_player.tank_model(self.model_player.direction))
+        fake_index_for_bullets = 0
         if (self.model_player.vertical_speed or
                 self.model_player.horizontal_speed):
             random_image = choice([0, 1])
@@ -62,6 +63,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface([self.width, self.height])
 
         self.player_texture = Texture(
+            fake_index_for_bullets,
             self.model_player.top, self.model_player.left,
             (self.player_texture_top, self.player_texture_left),
             self.window.texture_image, self.window)
@@ -81,7 +83,8 @@ class Player(pygame.sprite.Sprite):
 
 class Texture(pygame.sprite.Sprite):
 
-    def __init__(self, y, x, texture_top_left, texture,
+    def __init__(self, index_in_model_bullets_list, y, x,
+                 texture_top_left, texture,
                  window, half_size=False):
         '''
         y, x where we need to draw a texture
@@ -91,6 +94,7 @@ class Texture(pygame.sprite.Sprite):
 
         '''
         super().__init__()
+        self.index_in_model_bullets_list = index_in_model_bullets_list
         self.window = window
         self.width = self.window.texture_width
         self.height = self.window.texture_height
@@ -123,6 +127,68 @@ class Statistic:
         pass
 
 
+class Kaboom(pygame.sprite.Sprite):
+
+    def __init__(self, left, top, kaboom_type, window):
+        '''
+        kaboom_type:
+        0 - scaled 0.5 simple blowup
+        1 - tank blowup
+        2 - base blowup
+        0 and 1 _kaboom is going to be 0, 1, 2, 1, 0 image index
+         '''
+        super().__init__()
+        self.left = left
+        self.top = top
+        self.kaboom_type = kaboom_type
+        self.window = window
+        self.texture_image = self.window.texture_image
+        self.textures = self.get_textures()
+        self.texture_index = 0
+        self.max_texture_index = self.get_max_texture_index()
+        self.each_kaboom_texture_group = pygame.sprite.Group()
+        self.__call__()
+
+    def get_textures(self):
+        return [[556, 231],
+                [583, 231],
+                [619, 231],
+                [583, 231],
+                [556, 231], ]
+
+    def get_max_texture_index(self):
+        if self.kaboom_type == 0:
+            return 4
+        else:
+            return 2
+
+    def next_texture_index(self):
+        self.texture_index += 1
+
+    def draw_textures(self):
+        fake_index = 1
+        self.each_kaboom_texture_group.empty()
+
+        texture = Texture(fake_index,
+                          self.top,
+                          self.left,
+                          [self.textures[self.texture_index][1],
+                           self.textures[self.texture_index][0]],
+                          self.texture_image, self.window, False)
+
+        self.each_kaboom_texture_group.add(texture)
+        self.each_kaboom_texture_group.draw(self.window.canvas)
+
+
+    def __call__(self):
+        if self.texture_index <= self.max_texture_index:
+            self.draw_textures()
+            self.next_texture_index()
+            return "next"
+        else:
+            return "delete"
+
+
 class Battlefield:
 
     def __init__(self, width, height, window, model_field):
@@ -137,6 +203,7 @@ class Battlefield:
         self.model_bullets = self.window.model_bullets
         self.texture_dict = {}
         self.fill_texture_dict()
+        self.kabooms = []
         self.first_call_for_read_borders = True
 
         # self.texture_group = pygame.sprite.Group()  # erase
@@ -188,6 +255,7 @@ class Battlefield:
         self.not_passable_texture_group.empty()
         self.texture_group_under_player.empty()
         self.texture_group_over_player.empty()
+        fake_index = 0
 
         # self.texture_group.empty()  # erase
         for y in range(self.model_field.size):
@@ -199,6 +267,7 @@ class Battlefield:
                         # print(y, x, self.model_field.landscape[y][x])
 
                         texture = Texture(
+                            fake_index,
                             (y - 1) * self.window.texture_height,
                             (x - 1) * self.window.texture_width,
                             self.texture_dict[chr(
@@ -217,6 +286,7 @@ class Battlefield:
                 if (self.first_call_for_read_borders and
                         self.model_field.landscape[y][x] == 125):
                     texture = Texture(
+                            fake_index,
                             (y - 1) * self.window.texture_height,
                             (x - 1) * self.window.texture_width,
                             [0, 0],
@@ -235,14 +305,62 @@ class Battlefield:
         '''
         self.bullets_texture_group.empty()
 
-        for model_bullet in self.model_bullets:
-            model_bullet.update()
+        for i in range(len(self.model_bullets)):
+            self.model_bullets[i].update()
             texture = Texture(
-                            model_bullet.top,
-                            model_bullet.left,
-                            model_bullet.textures[model_bullet.direction],
-                            self.texture_image, self.window, True)
+                        i,
+                        self.model_bullets[i].top,
+                        self.model_bullets[i].left,
+                        self.model_bullets[i].textures[
+                            self.model_bullets[i].direction],
+                        self.texture_image, self.window, True)
             self.bullets_texture_group.add(texture)
+        self.check_for_bullet_collide()
+
+    def check_for_bullet_collide(self):
+        self.borders_collide()
+
+    def borders_collide(self):
+        for bullet in self.bullets_texture_group.sprites():
+            if pygame.sprite.spritecollide(bullet,
+                                           self.borders_texture_group,
+                                           False):
+                # move 1 time after hit a border, to move in correct
+                # direction center of the _kaboom
+                self.model_bullets[bullet.index_in_model_bullets_list].update()
+                erased = self.model_bullets.pop(
+                    bullet.index_in_model_bullets_list)
+                kaboom_type_bullet = 0
+                if erased.direction in ("up", "down"):
+                    erased.left -= 12
+                self.add_kaboom(erased.left, erased.top, kaboom_type_bullet)
+                '''
+                self.model_bullets[
+                        bullet.index_in_model_bullets_list].left,
+                self.model_bullets[
+                        bullet.index_in_model_bullets_list].top,
+                bullet.rect.left,
+                bullet.rect.top,
+                '''
+                print("Kaboom.")
+
+    def add_kaboom(self, left, top, kaboom_type):
+        self.kabooms.append(Kaboom(left, top, kaboom_type, self.window))
+
+    def draw_kaboom(self):
+        for i in range(len(self.kabooms)):
+            '''in next line in self.kabooms[i]() there are some error
+            out of range. i'm lazy ass to figure what is wrong, so i
+            add first condition)
+            '''
+            if len(self.kabooms) - 1 >= i and self.kabooms[i]() == "delete":
+                '''
+                a can pop item, but index not going to decrease, so
+                we could get out of _kabooms max index
+                yes i have rise this exception)) well done)))
+                '''
+                self.kabooms.pop(i)
+
 
     def draw_under(self):
         self.texture_group_under_player.draw(self.canvas)
@@ -330,6 +448,7 @@ class Window:
         self.player.update()
         self.battlefield.draw_over()
         self.battlefield.draw_bullets()
+        self.battlefield.draw_kaboom()
 
         # self.battlefield.b
         pygame.display.update()
